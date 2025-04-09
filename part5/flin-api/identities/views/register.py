@@ -16,7 +16,6 @@ from identities.services.registration import RegistrationService
 class RegisterAPI(APIView):
     permission_classes = (AllowAny,)
 
-    # TODO: if using phone number instead email, please adjust
     class RegisterInputData(ReadOnlySerializer):
         email = CharField(validators=[validate_email])
         password = CharField()

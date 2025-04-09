@@ -50,23 +50,6 @@ services:
     networks:
       - flin-network
 
-  # React Web application
-  web:
-    build:
-      context: ./flin-web
-      dockerfile: Dockerfile
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - static_volume:/app/static
-    ports:
-      - "5173:5173"
-    depends_on:
-      - api
-    environment:
-      - VITE_API_URL=http://localhost:8000/api
-    networks:
-      - flin-network
-
   # Nginx service
   nginx:
     image: nginx:1.23
@@ -77,7 +60,6 @@ services:
       - static_volume:/app/static
     depends_on:
       - api
-      - web
     networks:
       - flin-network
 
