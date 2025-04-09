@@ -1,0 +1,91 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - flin-network
+    environment:
+      - POSTGRES_USER=flin
+      - POSTGRES_PASSWORD=flinpassword
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+      
+  # Redis service
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # Django API application
+  api:
+    build:
+      context: ./flin-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./flin-api:/app
+      - static_volume:/app/static
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - ./flin-api/.env
+    environment:
+      - CACHE_LOCATION=redis://redis:6379/0
+      - DATABASE_URL=postgres://flin:flinpassword@postgres:5432/flin
+    ports:
+      - "8000:8000"
+    networks:
+      - flin-network
+
+  # React Web application
+  web:
+    build:
+      context: ./flin-web
+      dockerfile: Dockerfile
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/app/static
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    networks:
+      - flin-network
+
+  # Nginx service
+  nginx:
+    image: nginx:1.23
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/static
+    depends_on:
+      - api
+      - web
+    networks:
+      - flin-network
+
+networks:
+  flin-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  static_volume:
+  postgres_data:
