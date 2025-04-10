@@ -159,7 +159,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:8004",
     "http://web:5173",
     "http://part3-web:5173",
-    "http://16.78.198.190:8004"
+    "http://16.78.198.190:8004",
     "http://localhost",
 ]
 
