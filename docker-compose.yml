@@ -1,0 +1,191 @@
+version: '3'
+
+services:
+  part1-chatbot:
+    build: 
+      context: ./part1/chatbot
+      dockerfile: Dockerfile
+    container_name: flin-part1-chatbot
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      - PORT=3000
+    env_file:
+      - ./part1/chatbot/.env
+    volumes:
+      - ./part1/chatbot/knowledge:/app/knowledge
+    networks:
+      - part1-network
+
+  part1-nginx:
+    image: nginx:1.23
+    ports:
+      - "8001:80"
+    volumes:
+      - ./part1/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - part1-chatbot
+    networks:
+      - part1-network
+    restart: always
+  
+  part3-postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - part3_postgres_data:/var/lib/postgresql/data
+    networks:
+      - part3-network
+    environment:
+      - POSTGRES_USER=flin
+      - POSTGRES_PASSWORD=flinpassword
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+      
+  part3-redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - part3_redis_data:/data
+    networks:
+      - part3-network
+
+  part3-api:
+    build:
+      context: ./part3/flin-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./part3/flin-api:/app
+      - part3_static_volume:/app/static
+    depends_on:
+      part3-postgres:
+        condition: service_healthy
+      part3-redis:
+        condition: service_started
+    env_file:
+      - ./part3/flin-api/.env
+    environment:
+      - CACHE_LOCATION=redis://part3-redis:6379/0
+      - DATABASE_URL=postgres://flin:flinpassword@part3-postgres:5432/flin
+    ports:
+      - "8003:8000"
+    networks:
+      - part3-network
+
+  part3-web:
+    build:
+      context: ./part3/flin-web
+      dockerfile: Dockerfile
+    volumes:
+      - ./part3/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - part3_static_volume:/app/static
+    ports:
+      - "5173:5173"
+    depends_on:
+      - part3-api
+    environment:
+      - VITE_API_URL=http://part3-api:8000/api
+    networks:
+      - part3-network
+    restart: always
+
+  part3-nginx:
+    image: nginx:1.23
+    ports:
+      - "8004:80"
+    volumes:
+      - ./part3/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - part3_static_volume:/app/static
+    depends_on:
+      - part3-api
+      - part3-web
+    networks:
+      - part3-network
+    restart: always
+
+  part5-postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    volumes:
+      - part5_postgres_data:/var/lib/postgresql/data
+    networks:
+      - part5-network
+    environment:
+      - POSTGRES_USER=flin
+      - POSTGRES_PASSWORD=flinpassword
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+      
+  part5-redis:
+    image: redis:7
+    ports:
+      - "6380:6379"
+    volumes:
+      - part5_redis_data:/data
+    networks:
+      - part5-network
+
+  part5-api:
+    build:
+      context: ./part5/flin-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./part5/flin-api:/app
+      - part5_static_volume:/app/static
+    depends_on:
+      part5-postgres:
+        condition: service_healthy
+      part5-redis:
+        condition: service_started
+    env_file:
+      - ./part5/flin-api/.env
+    environment:
+      - CACHE_LOCATION=redis://part5-redis:6379/0
+      - DATABASE_URL=postgres://flin:flinpassword@part5-postgres:5432/flin
+    ports:
+      - "8005:8000"
+    networks:
+      - part5-network
+
+  part5-nginx: 
+    image: nginx:1.23
+    ports:
+      - "8006:80"
+    volumes:
+      - ./part5/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - part5_static_volume:/app/static
+    depends_on:
+      - part5-api
+    networks:
+      - part5-network
+    restart: always
+
+networks:
+  part1-network:
+    driver: bridge
+  part3-network:
+    driver: bridge
+  part5-network:
+    driver: bridge
+
+volumes:
+  part3_redis_data:
+  part3_static_volume:
+  part3_postgres_data:
+  part5_redis_data:
+  part5_static_volume:
+  part5_postgres_data:
