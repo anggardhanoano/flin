@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flin Chatbot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="dummy-content-container">
+    <div class="dummy-content">
+      <h1>Welcome to Flin Chatbot</h1>
+      <p>This is a demo page. Click the chat icon to start chatting with Flin!</p>
+    </div>
+  </div>
+  <div class="chat-widget">
+    <button id="chat-toggle" class="chat-toggle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+    </button>
+    
+    <div class="chat-container collapsed" id="chat-container">
+      <div class="chat-header">
+        <h1>Flin Chatbot</h1>
+        <button id="close-chat" class="close-chat">✕</button>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="message bot">
+          <div class="message-content">Halo, saya FlinBot! siap membantu anda dalam menjawab pertanyaan terkait Flin :D. \n\nTolong jangan masukan data2 sensitif disini ya, karena berbahaya</div>
+        </div>
+      </div>
+      <div class="chat-input-container">
+        <input type="text" id="user-input" placeholder="Type your message here..." />
+        <button id="send-button">Send</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="client.js"></script>
+</body>
+</html>
