@@ -40,4 +40,5 @@
 
 ## HOW TO TEST APIs
 
+- Please check video in here for how to use Postman https://drive.google.com/file/d/1KxzZmhvx5MkVsUJaHMJga6JW0meB12tz/view?usp=sharing
 - For the endpoint, can check each part README file or check from the Swagger (please read README)
