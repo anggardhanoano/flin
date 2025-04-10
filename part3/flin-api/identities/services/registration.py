@@ -30,7 +30,8 @@ class RegistrationService(Runnable):
             new_user: User = User.objects.create_user(
                 email=email.lower(), password=password, full_name=full_name
             )
-        except IntegrityError:
+        except IntegrityError as e:
+            print(str(e))
             raise BadRequestException(EMAIL_ALREADY_EXIST)
         except Exception as e:
             raise BadRequestException(str(e))

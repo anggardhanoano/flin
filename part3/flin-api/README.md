@@ -1,5 +1,3 @@
-# starter-api
-
 ## Setup Development Environment
 
 ### Requirements

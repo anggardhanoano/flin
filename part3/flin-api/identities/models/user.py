@@ -29,10 +29,11 @@ class UserManager(BaseUserManager):
         if not email and not should_allow_incomplete:
             raise ValueError("Email Required")
 
-        phone_number = self.format_phone_number(phone_number)
+        if phone_number != "":
+            phone_number = self.format_phone_number(phone_number)
 
-        if phone_number and not (8 <= len(phone_number) <= 16):
-            raise ValueError("Wrong Phone Number Format")
+            if phone_number and not (8 <= len(phone_number) <= 16):
+                raise ValueError("Wrong Phone Number Format")
 
         user = self.model(email=self.normalize_email(email.lower()) or None)
         user.phone_number = phone_number
@@ -114,7 +115,8 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     full_name = models.CharField(max_length=256)
 
     email = models.EmailField(unique=True, null=False, default=None)
-    username = models.CharField(max_length=64, unique=True)
+    username = models.CharField(
+        max_length=64, unique=True, blank=True, null=True)
 
     phone_number = models.CharField(max_length=16, unique=True)
 
