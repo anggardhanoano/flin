@@ -94,7 +94,7 @@ services:
     depends_on:
       - part3-api
     environment:
-      - VITE_API_URL=http://part3-api:8000/api
+      - VITE_API_URL=http://part3-api:8000/
     networks:
       - part3-network
     restart: always

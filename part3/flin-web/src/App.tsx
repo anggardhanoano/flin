@@ -13,7 +13,7 @@ function App() {
     onSubmit: async (values, { resetForm }) => {
       console.log("Form submitted:", values);
       //  use fetch api to post the data to the server
-      const response = await fetch("http://localhost:8003/leads/", {
+      const response = await fetch("http://16.78.198.190:8003/leads/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
