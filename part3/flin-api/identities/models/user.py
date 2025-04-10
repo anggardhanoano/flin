@@ -118,7 +118,8 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     username = models.CharField(
         max_length=64, unique=True, blank=True, null=True)
 
-    phone_number = models.CharField(max_length=16, unique=True)
+    phone_number = models.CharField(
+        max_length=16, unique=True,  blank=True, null=True)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
